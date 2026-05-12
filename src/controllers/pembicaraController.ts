@@ -37,7 +37,7 @@ export const createPembicara = (req: Request, res: Response) => {
 export const showPembicaraById = (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
-    const Pembicara = pembicara.find((e) => e.id === id);
+    const Pembicara = pembicara.find((p) => p.id === id);
 
     //Jika data tidak ada
     if (!Pembicara) {
@@ -50,7 +50,56 @@ export const showPembicaraById = (req: Request, res: Response) => {
 };
 
 //4. mengupdate data pembicara berdasarkan id 
-export const updatePembicara = (req: Request, res: Response) => {};
+export const updatePembicara = (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    const { name, role } = req.body;
+
+    const index = pembicara.findIndex((p) => p.id === id);
+
+    //cek apakah data ada
+    if (index === -1) {
+        return res.status(404).json({
+            message: "Pembicara tidak ditemukan",
+        });
+    }
+
+    //validasi input
+    if (!name || !role) {
+        return res.status(400).json({
+            message: "Nama dan role harus diisi",
+        });
+    }
+
+    //update data
+    pembicara[index] = {
+        id: pembicara[index]!.id,
+        name: name,
+        role: role
+    };
+
+    //response hasil update
+    res.json(pembicara[index]);
+};
 
 //5. menghapus data pembicara berdasarkan id
-export const deletePembicara = (req: Request, res: Response) => {};
+export const deletePembicara = (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    const index = pembicara.findIndex((p) => p.id === id);
+
+    //cek apakah data ada
+    if (index === -1) {
+        return res.status(404).json({
+            message: "Pembicara tidak ditemukan",
+        });
+    }
+
+    //hapus data
+    pembicara.splice(index, 1);
+
+    //response berhasil
+    res.json({
+        message: "Pembicara berhasil dihapus",
+    });
+};

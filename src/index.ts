@@ -1,15 +1,15 @@
-import experess from "express";
+import express from "express";
 import cors from "cors";
 
 import eventRoutes from "./routes/eventRoute";
 import categoryRoutes from "./routes/categoryRoute";
 import pembicaraRoutes from "./routes/pembicaraRoute";
 
-const app = experess();
+const app = express();
 const port = 3000;
 
 app.use(cors());
-app.use(experess.json());
+app.use(express.json());
 
 app.get("/", (req, res) => {
     res.send("Ini adalah api untuk aplikasi Invofest!");
