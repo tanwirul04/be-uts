@@ -1,7 +1,8 @@
 export interface Event {
-    id: number;
     name: string;
-    category: number;
-    tanggal: Date;
-    deskripsi: string;
+    location: string;
+    categoryId: number;
+    pembicaraId: number;
+    dateEvent: string; 
+    description: string;
 }

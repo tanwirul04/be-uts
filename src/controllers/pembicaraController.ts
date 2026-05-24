@@ -1,105 +1,85 @@
 import { Request, Response } from "express";
-import { Pembicara } from "../types/pembicara";
+import { Pembicara } from "../types/pembicara.js";
+import { prisma } from "../lib/db.js";
 
 let pembicara: Pembicara[] = [];
 
 //1. menampilkan data 
-export const getPembicara = (req: Request, res: Response) => {
-    res.json(pembicara);
+export const getPembicara = async (req: Request, res: Response) => {
+    const AllSpeakers = await prisma.pembicara.findMany({
+            orderBy: {
+                createAt : "desc",
+            },
+        })
+
+    res.json(AllSpeakers);
 };
 
 //2. menyimpan data
-export const createPembicara = (req: Request, res: Response) => {
+export const createPembicara = async (req: Request, res: Response) => {
     const { name, role } = req.body;
 
     //validasi jika name kosong
         if (!name || !role) {
-            return res.status(500).json({ 
-                message: "Nama dan role harus diisi", 
-            });
-        }
-    
-        //mapping data
-        const newPembicara: Pembicara = {
-            id: Date.now(),
-            name: name,
-            role: role
-        };
-    
-        //simpan datannya
-        pembicara.push(newPembicara);
-    
-        //jika berhasil disimpan
-        res.status(201).json(newPembicara);
+        return res.status(400).json({ message: "Nama dan role pembicara harus diisi" });
+    }
+
+    const newPembicara = await prisma.pembicara.create({
+        data: { name, role },
+    });
+    res.status(201).json(newPembicara);
 };
 
 //3. mengambil data pembicara berdasarkan id
-export const showPembicaraById = (req: Request, res: Response) => {
+export const getPembicaraById = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
-    const Pembicara = pembicara.find((p) => p.id === id);
-
-    //Jika data tidak ada
-    if (!Pembicara) {
-        return res.status(404).json({
-            message: "Pembicara tidak ditemukan",
-        });
+    const pembicara = await prisma.pembicara.findUnique({ where: { id } });
+    if (!pembicara) {
+        return res.status(404).json({ message: "Pembicara tidak ditemukan" });
     }
-    //jika ada
-    res.json(Pembicara);
+    res.json(pembicara);
 };
 
 //4. mengupdate data pembicara berdasarkan id 
-export const updatePembicara = (req: Request, res: Response) => {
+export const updatePembicara = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
-
     const { name, role } = req.body;
 
-    const index = pembicara.findIndex((p) => p.id === id);
-
-    //cek apakah data ada
-    if (index === -1) {
-        return res.status(404).json({
-            message: "Pembicara tidak ditemukan",
-        });
-    }
-
-    //validasi input
     if (!name || !role) {
-        return res.status(400).json({
-            message: "Nama dan role harus diisi",
-        });
+        return res.status(400).json({ message: "Nama dan role harus diisi" });
     }
 
-    //update data
-    pembicara[index] = {
-        id: pembicara[index]!.id,
-        name: name,
-        role: role
-    };
+    const pembicara = await prisma.pembicara.findUnique({ where: { id } });
+    if (!pembicara) {
+        return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+    }
 
-    //response hasil update
-    res.json(pembicara[index]);
+    const updated = await prisma.pembicara.update({
+        where: { id },
+        data: { name, role },
+    });
+    res.json(updated);
 };
-
 //5. menghapus data pembicara berdasarkan id
-export const deletePembicara = (req: Request, res: Response) => {
+export const deletePembicara = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
-    const index = pembicara.findIndex((p) => p.id === id);
+    const pembicara = await prisma.pembicara.findUnique({ where: { id } });
+    if (!pembicara) {
+        return res.status(404).json({ message: "Pembicara tidak ditemukan" });
+    }
 
-    //cek apakah data ada
-    if (index === -1) {
-        return res.status(404).json({
-            message: "Pembicara tidak ditemukan",
+    const isPembicaraUsed = await prisma.event.findFirst({
+        where: { pembicaraId: id }
+    });
+
+    if (isPembicaraUsed) {
+        return res.status(400).json({ 
+            message: "Gagal menghapus! Pembicara ini masih terdaftar di salah satu event aktif." 
         });
     }
 
-    //hapus data
-    pembicara.splice(index, 1);
-
-    //response berhasil
-    res.json({
-        message: "Pembicara berhasil dihapus",
-    });
+    await prisma.pembicara.delete({ where: { id } });
+    res.json({ message: "Pembicara berhasil dihapus" });
 };

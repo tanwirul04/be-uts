@@ -1,10 +1,10 @@
 import{
     getCategories,
     createCategory,
-    showCategoryById,
+    getCategoryById,
     updateCategory,
     deleteCategory,
-} from '../controllers/categoryController';
+} from '../controllers/categoryController.js';
 
 import express from 'express';
 
@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("/", getCategories); //menampilkan data category
 router.post("/", createCategory); //menyimpan data category
-router.get("/:id", showCategoryById); //menampilkan category berdasarkan id
+router.get("/:id", getCategoryById); //menampilkan category berdasarkan id
 router.put("/:id", updateCategory); //mengupdate data category berdasarkan id
 router.delete("/:id", deleteCategory); //menghapus data category berdasarkan id
 

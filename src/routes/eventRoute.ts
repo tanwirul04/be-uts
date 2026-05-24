@@ -4,7 +4,7 @@ import{
     getEventById,
     updateEvent,
     deleteEvent
-} from '../controllers/eventController';
+} from '../controllers/eventController.js';
 
 import express from 'express';
 
