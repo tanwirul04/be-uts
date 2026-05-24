@@ -4,5 +4,5 @@
 * Kelas : 4B
 
 # Link
-* Frontend :
+* Repositori Frontend : https://github.com/tanwirul04/pemkom2-frontend-uts.git
 * YouTube :
