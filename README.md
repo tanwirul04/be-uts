@@ -5,4 +5,5 @@
 
 # Link
 * Repositori Frontend : https://github.com/tanwirul04/pemkom2-frontend-uts.git
+* Deploy Backend : https://be-uts-production-c49e.up.railway.app/
 * YouTube :
